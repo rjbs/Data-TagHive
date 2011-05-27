@@ -8,9 +8,7 @@ use Try::Tiny;
 use lib 't/lib';
 use Test::TagHive;
 
-use Data::TagHive;
-
-set_taghive( Data::TagHive->new );
+new_taghive;
 
 taghive->add_tag('fauxbox.type:by-seat.seats:17');
 
