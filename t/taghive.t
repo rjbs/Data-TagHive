@@ -56,4 +56,10 @@ for my $str (@hasnt) {
   like($error, qr/conflict at \Qfauxbox.type\E\b/, "...we get expected error");
 }
 
+for my $method (qw(add has_tag)) {
+  my $error = exception { $taghive->$method('not a tag!'); };
+  ok($error, "can't pass invalid tag to $method");
+  like($error, qr/invalid tagstr/, "...we get expected error");
+}
+
 done_testing;
