@@ -21,10 +21,10 @@ subtest "leaf deletion" => sub {
 
   taghive->delete_tag('fauxbox.type:by-seat.xyzzy');
 
-  hasnt_tag('fauxbox.type:by-seat.xyzzy');
+  has_tag('fauxbox.type:by-seat');
   has_tag('fauxbox.type:by-seat.aeron');
   has_tag('fauxbox.type:by-seat.seats:17');
-  has_tag('fauxbox.type:by-seat');
+  hasnt_tag('fauxbox.type:by-seat.xyzzy');
 };
 
 subtest "parent deletion" => sub {
@@ -32,12 +32,23 @@ subtest "parent deletion" => sub {
 
   taghive->delete_tag('fauxbox.type:by-seat');
 
-  hasnt_tag('fauxbox.type:by-seat.xyzzy');
+  has_tag('fauxbox');
+  hasnt_tag('fauxbox.type:by-seat');
   hasnt_tag('fauxbox.type:by-seat.aeron');
   hasnt_tag('fauxbox.type:by-seat.seats:17');
-  hasnt_tag('fauxbox.type:by-seat');
+  hasnt_tag('fauxbox.type:by-seat.xyzzy');
+};
+
+subtest "bogus parent deletion" => sub {
+  _init_taghive;
+
+  taghive->delete_tag('fauxbox:foo');
 
   has_tag('fauxbox');
+  has_tag('fauxbox.type:by-seat');
+  has_tag('fauxbox.type:by-seat.aeron');
+  has_tag('fauxbox.type:by-seat.seats:17');
+  has_tag('fauxbox.type:by-seat.xyzzy');
 };
 
 done_testing;

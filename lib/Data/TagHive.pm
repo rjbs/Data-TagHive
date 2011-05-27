@@ -92,7 +92,7 @@ sub delete_tag {
   delete @$state{ @keys };
 
   if ($tagstr =~ s/:($tagvalue_re)\z//) {
-    delete $state->{ $tagstr };
+    delete $state->{ $tagstr } if $state->{$tagstr} // '' eq $1;
   }
 }
 
