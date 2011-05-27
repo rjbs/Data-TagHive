@@ -2,6 +2,8 @@ use 5.12.0;
 use warnings;
 
 package Data::TagHive;
+# ABSTRACT: hierarchical tags with values
+
 use Carp;
 
 sub new {
