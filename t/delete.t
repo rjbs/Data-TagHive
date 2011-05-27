@@ -27,4 +27,17 @@ subtest "leaf deletion" => sub {
   has_tag('fauxbox.type:by-seat');
 };
 
+subtest "parent deletion" => sub {
+  _init_taghive;
+
+  taghive->delete_tag('fauxbox.type:by-seat');
+
+  hasnt_tag('fauxbox.type:by-seat.xyzzy');
+  hasnt_tag('fauxbox.type:by-seat.aeron');
+  hasnt_tag('fauxbox.type:by-seat.seats:17');
+  hasnt_tag('fauxbox.type:by-seat');
+
+  has_tag('fauxbox');
+};
+
 done_testing;
