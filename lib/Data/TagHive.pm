@@ -82,4 +82,14 @@ sub has_tag {
   return;
 }
 
+sub delete_tag {
+  my ($self, $tagstr) = @_;
+
+  $self->_assert_tagstr($tagstr);
+
+  my $state = $self->{state};
+  my @keys  = grep { /\A$tagstr(?:$|[.:])/ } keys %$state;
+  delete @$state{ @keys };
+}
+
 1;
