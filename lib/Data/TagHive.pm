@@ -60,6 +60,8 @@ sub add_tag {
     $state->{ $key } = $value;
 
     $stem = defined $value ? "$key:$value" : $key;
+
+    $state->{$stem} = undef;
   }
 }
 
@@ -70,15 +72,6 @@ sub has_tag {
 
   $self->_assert_tagstr($tagstr);
   return 1 if exists $state->{$tagstr};
-
-  return unless $tagstr =~ s/:($tagvalue_re)\z//;
-  my $value = $1;
-
-  return unless exists $state->{$tagstr};
-
-  return 1 if ! defined $state->{$tagstr};
-  return 1 if $state->{$tagstr} eq $value;
-
   return;
 }
 
