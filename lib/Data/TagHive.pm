@@ -17,10 +17,16 @@ my $tagvalue_re = qr{ [-a-z0-9_]+ }x;
 my $tagpair_re  = qr{ $tagname_re (?::$tagvalue_re)? }x;
 my $tagstr_re   = qr{ \A $tagpair_re (?:\.$tagpair_re)* \z }x;
 
+sub _assert_tagstr {
+  my ($self, $tagstr) = @_;
+  croak "invalid tagstr <$tagstr>" unless $tagstr =~ $tagstr_re;
+}
+
 sub _tag_pairs {
   my ($self, $tagstr) = @_;
 
-  croak "invalid tagstr <$tagstr>" unless $tagstr =~ $tagstr_re;
+  $self->_assert_tagstr($tagstr);
+
   my @tags = map { my @pair = split /:/, $_; $#pair = 1; \@pair }
              split /\./, $tagstr;
 
@@ -62,7 +68,7 @@ sub has_tag {
 
   my $state = $self->{state};
 
-  croak "invalid tagstr <$tagstr>" unless $tagstr =~ $tagstr_re;
+  $self->_assert_tagstr($tagstr);
   return 1 if exists $state->{$tagstr};
 
   return unless $tagstr =~ s/:($tagvalue_re)\z//;
