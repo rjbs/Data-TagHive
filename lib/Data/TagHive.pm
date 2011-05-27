@@ -90,6 +90,10 @@ sub delete_tag {
   my $state = $self->{state};
   my @keys  = grep { /\A$tagstr(?:$|[.:])/ } keys %$state;
   delete @$state{ @keys };
+
+  if ($tagstr =~ s/:($tagvalue_re)\z//) {
+    delete $state->{ $tagstr };
+  }
 }
 
 1;
