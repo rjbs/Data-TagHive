@@ -36,7 +36,7 @@ sub __differ {
   return $x ne $y;
 }
 
-sub add {
+sub add_tag {
   my ($self, $tagstr) = @_;
 
   my $state = $self->{state};
