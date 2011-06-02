@@ -89,4 +89,9 @@ sub delete_tag {
   }
 }
 
+sub all_tags {
+  my ($self) = @_;
+  return keys %{ $self->{state} };
+}
+
 1;

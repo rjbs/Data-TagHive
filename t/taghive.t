@@ -25,6 +25,18 @@ hasnt_tag($_) for qw(
   fauxbox.type:by-seat.seats:92
 );
 
+is_deeply(
+  [ sort(taghive()->all_tags) ],
+  [ sort qw(
+    fauxbox
+    fauxbox.type
+    fauxbox.type:by-seat
+    fauxbox.type:by-seat.seats
+    fauxbox.type:by-seat.seats:17
+  ) ],
+  "all tags in ->all_tags",
+);
+
 {
   my $error = exception { taghive->add_tag('fauxbox.type:by-usage') };
   ok($error, "we can't add a tag with a conflicting value");
