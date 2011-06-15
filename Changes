@@ -2,5 +2,7 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.001     2011-06-15 16:42:06 America/New_York
+
           first release
 
