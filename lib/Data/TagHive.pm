@@ -6,6 +6,58 @@ package Data::TagHive;
 
 use Carp;
 
+=head1 SYNOPSIS
+
+  use Data::TagHive;
+
+  my $taghive = Data::TagHive->new;
+
+  $taghive->add_tag('book.topic:programming');
+
+  $taghive->has_tag('book'); # TRUE
+
+=head1 OVERVIEW
+
+Data::TagHive is the bizarre, corrupted union of L<String::TagString> and
+L<Data::Hive>.  It combines the "simple list of strings" of the former with the
+"hierarchical key-value/value pairs" of the latter, using a different interface
+from either.
+
+It's probably better than that sounds, though.
+
+A Data::TagHive object represents a set of tags.  Each tag is a string that
+represents a structure of nested key-value pairs.  For example, a library book
+might be tagged:
+
+  book.pages.size:letter
+  book.pages.count:180
+  book.type:hardcover
+  book.topic:programming.perl.cpan
+
+Each tag is a set of key-value pairs.  Later pairs are qualified by earlier
+pairs.  Values are optional.  Keys and values are separated by colons.
+Key-value pairs are separated by dots.
+
+A tag is considered present if it was set explicitly or if any more-specific
+subtag of it was set.  For example, if we had explicitly added all the tags
+shown above, a tag hive would then report true if asked whether each of the
+following tags were set:
+
+  book
+  book.pages
+  book.pages.size
+  book.pages.size:letter
+  book.pages.count
+  book.pages.count:180
+  book.type
+  book.type:hardcover
+  book.topic
+  book.topic:programming
+  book.topic:programming.perl
+  book.topic:programming.perl.cpan
+
+=cut
+
 sub new {
   my ($class) = @_;
 
@@ -42,6 +94,20 @@ sub __differ {
   return $x ne $y;
 }
 
+=method add_tag
+
+  $taghive->add_tag( $tagstr );
+
+This method adds the given tag (given as a string) to the hive.  It will fail
+if there are conflicts.  For example, if "foo:bar" is already set, "foo:xyz"
+cannot be set.  Each tag can only have one value.
+
+Tags without values may be given values through C<add_tag>, but only if they
+have no tags beneath them.  For example, given a tag hive with "foo.bar"
+tagged, "foo.bar:baz" could be added, but not "foo:baz"
+
+=cut
+
 sub add_tag {
   my ($self, $tagstr) = @_;
 
@@ -72,7 +138,6 @@ sub add_tag {
         croak "can't add <$tagstr> to taghive; conflict at $key"
           if defined $value and defined $existing and $value ne $existing;
 
-
         my $more_to_set = defined($value)         || @pairs;
         my $more_exists = defined($state->{$key}) || grep { /\A\Q$key./ } @tags;
 
@@ -90,6 +155,14 @@ sub add_tag {
   }
 }
 
+=method has_tag
+
+  if ($taghive->has_tag( $tagstr )) { ... }
+
+This method returns true if the tag hive has the tag.
+
+=cut
+
 sub has_tag {
   my ($self, $tagstr) = @_;
 
@@ -99,6 +172,17 @@ sub has_tag {
   return 1 if exists $state->{$tagstr};
   return;
 }
+
+=method delete_tag
+
+  $taghive->delete_tag( $tagstr );
+
+This method deletes the tag from the hive, along with any tags below it.
+
+If your hive has "foo.bar:xyz.abc" and you C<delete_tag> "foo.bar" it will be
+left with nothing but the tag "foo"
+
+=cut
 
 sub delete_tag {
   my ($self, $tagstr) = @_;
@@ -113,6 +197,13 @@ sub delete_tag {
     delete $state->{ $tagstr } if $state->{$tagstr} // '' eq $1;
   }
 }
+
+=method all_tags
+
+This method returns, as a list of strings, all the tags set on the hive either
+explicitly or implicitly.
+
+=cut
 
 sub all_tags {
   my ($self) = @_;
