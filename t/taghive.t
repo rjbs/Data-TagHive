@@ -26,7 +26,7 @@ hasnt_tag($_) for qw(
 );
 
 is_deeply(
-  [ sort(taghive()->all_tags) ],
+  [ sort { $a cmp $b } taghive->all_tags ],
   [ sort qw(
     fauxbox
     fauxbox.type
@@ -65,6 +65,21 @@ for my $method (qw(add_tag has_tag)) {
   my $error = exception { taghive->$method('not a tag!'); };
   ok($error, "can't pass invalid tag to $method");
   like($error, qr/invalid tagstr/, "...we get expected error");
+}
+
+{
+  new_taghive->add_tag('foo');
+
+  taghive->add_tag('foo');
+  pass("we can re-add an exact valueless tag");
+
+  taghive->add_tag('foo:bar');
+  pass("we can add a value to a valueless tag, if it has no descendants");
+
+  taghive->add_tag('bar');
+  taghive->add_tag('bar.baz');
+  my $error = exception { taghive->add_tag('bar:quux') };
+  like($error, qr/conflict/, "...but not if it DOES have descendants");
 }
 
 done_testing;

@@ -47,15 +47,40 @@ sub add_tag {
 
   my $state = $self->{state};
 
+  my @tags  = $self->all_tags;
+  my @pairs = $self->_tag_pairs($tagstr);
+
   my $stem = '';
-  for my $pair ($self->_tag_pairs($tagstr)) {
+
+  while (my $pair = shift @pairs) {
     $stem .= '.' if length $stem;
 
     my $key   = $stem . $pair->[0];
     my $value = length($pair->[1]) ? $pair->[1] : undef;
 
-    croak "can't add <$tagstr> to taghive; conflict at $key"
-      if exists $state->{ $key } and __differ($value, $state->{$key});
+    CONFLICT: {
+      if (exists $state->{ $key }) {
+        my $existing = $state->{ $key };
+
+        # Easiest cases: if they're both undef, or are eq, no conflict.
+        last CONFLICT unless __differ($value, $existing);
+
+        # Easist conflict case: we want to set tag:value1 but tag:value2 is
+        # already set.  No matter whether there are descendants on either side,
+        # this is a
+        # conflict.
+        croak "can't add <$tagstr> to taghive; conflict at $key"
+          if defined $value and defined $existing and $value ne $existing;
+
+
+        my $more_to_set = defined($value)         || @pairs;
+        my $more_exists = defined($state->{$key}) || grep { /\A\Q$key./ } @tags;
+
+        croak "can't add <$tagstr> to taghive; conflict at $key"
+          if $more_to_set and $more_exists;
+      }
+    }
+
 
     $state->{ $key } = $value;
 
