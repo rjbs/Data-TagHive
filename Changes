@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+          update bugtracker and repo (again)
 
 0.002     2013-07-05 22:09:39 America/New_York
           update bugtracker
