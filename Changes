@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+        - update author info
+        - document perl version policy
 
 0.003     2013-12-16 22:07:56-0500 America/New_York
           update bugtracker and repo (again)
